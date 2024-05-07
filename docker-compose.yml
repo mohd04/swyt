@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  nestjs:
+    image: node:19
+    container_name: nestjs
+    working_dir: /app/backend
+    command: >
+      bash -c "npm install
+      && npx prisma db push
+      && npx prisma db seed
+      && npm run build
+      && npm run start:prod
+      && npm i -g @nestjs/cli"
+    ports:
+      - "3001:3001"
+      - "5555:5555"
+      - "8001:8001"
+      - "8002:8002"
+    env_file:
+      - ./swyt-backend/.env
+    volumes:
+      - ./swyt-backend:/app/backend
+      - /app/backend/node_modules
+    depends_on:
+      - postgres
+
+  vue-app:
+    build:
+      context: ./swyt-frontend
+      dockerfile: Dockerfile
+    container_name: vue-frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - nestjs
+
+  postgres:
+    image: postgres:13
+    container_name: postgresprisma
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./swyt-backend/.env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
+    name: nest-prisma-docker-db
