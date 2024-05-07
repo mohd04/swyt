@@ -29,8 +29,8 @@ To get the application running locally:
 
 From the root directory, run:
 
-```bash
-docker-compose up --build
+  ```bash
+   docker-compose up --build
 
 ## Access the Application
 

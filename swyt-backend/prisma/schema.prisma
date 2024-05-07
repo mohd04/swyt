@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id            Int        @id @default(autoincrement())
+  name          String     @unique
+  parentId      Int?       @map("parent_id")
+  parent        Category?  @relation("ParentChild", fields: [parentId], references: [id])
+  children      Category[] @relation("ParentChild")
+  products      Product[]  @relation("ProductCategories")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Product {
+  id            Int         @id @default(autoincrement())
+  name          String
+  description   String
+  price         Float
+  image         String      // Assuming image URLs are stored as strings
+  size          Int
+  brand         Brand
+  categories    Category[]  @relation("ProductCategories")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+enum Brand {
+  ADIDAS
+  NIKE
+  PUMA
+  REEBOK
+  UNDER_ARMOUR
+}
